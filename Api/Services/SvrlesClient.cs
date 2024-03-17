@@ -1,16 +1,17 @@
+using System.Text;
+using System.Text.Json;
+
 namespace Api.Services;
 
 public class SvrlesClient(HttpClient httpClient)
 {
     public async Task<string> ShortenUrl(string url)
     {
-        /*var response = await httpClient.PostAsync($"shorten/{url}", null);
+        var response = await httpClient.PostAsync($"api/shortUrl", new StringContent(JsonSerializer.Serialize(new { OriginUrl = url }), Encoding.UTF8, "application/json"));
         response.EnsureSuccessStatusCode();
-        var result = await response.Content.ReadAsStringAsync();*/
-        
-        // Generate a random string to simulate the shortened URL
-        // the value should be a random string of 6 characters
-        var result = new string(Enumerable.Range(0, 6).Select(_ => (char)('a' + Random.Shared.Next(0, 26))).ToArray());
-        return await Task.FromResult("svrl.es/" + result);
+        var result = await response.Content.ReadAsStringAsync();
+        var json = JsonDocument.Parse(result);
+        var shortUrl = json.RootElement.GetProperty("ShortenedUrl").GetString();
+        return shortUrl;
     }
 }
