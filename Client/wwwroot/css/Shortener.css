@@ -45,9 +45,16 @@ button:hover {
     opacity: 0.8;
 }
 
+.shorten-urls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 150px;
+}
+
 .shortened-url {
     background-color: #ffffff;
-    margin: 10px auto 150px auto;
+    margin: 10px auto;
     width: 92%;
     padding: 12px 20px;
     border: 3px solid lightseagreen;

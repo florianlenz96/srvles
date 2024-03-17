@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using BlazorApp.Client.Services
+@using BlazorApp.Shared.Models.ShortenedUrl
+@using System.Text.Json
 
 <PageTitle>Free URL Shortener | by neocentric</PageTitle>
 <link rel="stylesheet" type="text/css" href="css/Shortener.css">
@@ -20,10 +22,10 @@
             @foreach (var shortUrl in shortUrls)
             {
                 <div class="shortened-url">
-                    <span class="origin-url">@shortUrl</span>
-                    <a class="short-url" href="https://google.de" target="_blank">srvl.es/krzya</a>
+                    <span class="origin-url">@shortUrl.Key</span>
+                    <a class="short-url" href="@shortUrl.Value" target="_blank">@shortUrl.Value</a>
                     <i class="icon bi bi-qr-code" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"></i>
-                    <i class="icon bi bi-clipboard" onclick="@CopyToClipboard(shortUrl)" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"></i>
+                    <i class="icon bi bi-clipboard" onclick="@CopyToClipboard(shortUrl.Value)" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"></i>
                 </div>
             }
         </div>
@@ -34,17 +36,20 @@
 
 @code {
     string url = string.Empty;
-    List<string> shortUrls = new List<string>();
+    Dictionary<string, string> shortUrls = new();
     
     [Inject]
     CookieStorageAccessor _storageAccessor { get; set; }
     
     [Inject]
     CopyAccessor _copyAccessor { get; set; }
+    
+    [Inject]
+    HttpClient bffClient { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var storedUrls = await _storageAccessor.GetValueAsync<List<string>>("shortUrls");
+        var storedUrls = await _storageAccessor.GetValueAsync<Dictionary<string, string>>("shortUrls");
         if (storedUrls != null)
         {
             shortUrls = storedUrls;
@@ -55,7 +60,22 @@
 
     async Task Shorten(EditContext editContext)
     {
-        shortUrls.Add(editContext.Model.ToString()!);
+        var originUrl = editContext.Model.ToString();
+        
+        var responseMessage = await bffClient.PostAsJsonAsync("api/ShortenUrl", new ShortenUrlRequest
+        {
+            Url = originUrl,
+        });
+
+        if (!responseMessage.IsSuccessStatusCode)
+        {
+            return;
+        }
+        
+        var shortenUrlJson = await responseMessage.Content.ReadAsStringAsync();
+        var shortenUrlObj = JsonSerializer.Deserialize<ShortenUrlResponse>(shortenUrlJson);
+        
+        shortUrls.Add(originUrl, shortenUrlObj.ShortenedUrl);
         await _storageAccessor.SetValueAsync("shortUrls", shortUrls);
         url = string.Empty;
     }
