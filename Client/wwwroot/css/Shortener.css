@@ -1,0 +1,81 @@
+div#shortener {
+    background-color: #e0e0e0 !important;
+    width: 100%;
+}
+
+article {
+    margin: 0 auto;
+    padding-top: 150px !important;
+    padding-bottom: 150px !important;
+    background-color: #e0e0e0 !important;
+    width: 900px;
+}
+
+article p {
+    color: #4f5050;
+}
+
+input[type="url"] {
+    padding: 12px 20px;
+    margin: 50px 0 50px 0;
+    box-sizing: border-box;
+    border: 3px solid #ccc;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+    width: 80%;
+    border-radius: 5px;
+}
+
+input[type="url"]:focus {
+    border: 3px solid #555;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.shortened-url {
+    background-color: #ffffff;
+    margin: 10px auto 150px auto;
+    width: 92%;
+    padding: 12px 20px;
+    border: 3px solid lightseagreen;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: 1.25em;
+    align-items: center;
+}
+
+span.origin-url {
+    flex-grow: 2;
+    text-align: left;
+}
+
+a.short-url {
+    flex-grow: 1;
+}
+
+i.icon {
+    font-size: 1.5em;
+    margin-left: 20px;
+    cursor: pointer;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+}
+
+i.icon:hover {
+    color: lightseagreen;
+}
