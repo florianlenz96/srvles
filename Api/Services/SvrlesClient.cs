@@ -10,8 +10,6 @@ public class SvrlesClient(HttpClient httpClient)
         var response = await httpClient.PostAsync($"api/shortUrl", new StringContent(JsonSerializer.Serialize(new { OriginUrl = url }), Encoding.UTF8, "application/json"));
         response.EnsureSuccessStatusCode();
         var result = await response.Content.ReadAsStringAsync();
-        var json = JsonDocument.Parse(result);
-        var shortUrl = json.RootElement.GetProperty("ShortenedUrl").GetString();
-        return shortUrl;
+        return result;
     }
 }
