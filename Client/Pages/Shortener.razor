@@ -23,7 +23,7 @@
             {
                 <div class="shortened-url">
                     <span class="origin-url">@shortUrl.Key</span>
-                    <a class="short-url" href="@shortUrl.Value" target="_blank">@shortUrl.Value</a>
+                    <a class="short-url" href="@shortUrl.Value" target="_blank">@string.Join(".", shortUrl.Value.Split(".")[^2..])</a>
                     <i class="icon bi bi-qr-code" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"></i>
                     <i class="icon bi bi-clipboard" onclick="@CopyToClipboard(shortUrl.Value)" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"></i>
                 </div>
