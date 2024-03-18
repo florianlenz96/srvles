@@ -62,20 +62,20 @@
     {
         var originUrl = editContext.Model.ToString();
         
-        var responseMessage = await bffClient.PostAsJsonAsync("api/ShortenUrl", new ShortenUrlRequest
+        var json = JsonSerializer.Serialize(new ShortenUrlRequest
         {
             Url = originUrl,
         });
+        var responseMessage = await bffClient.PostAsync("api/ShortenUrl", new StringContent(json, System.Text.Encoding.UTF8, "application/json"));
 
         if (!responseMessage.IsSuccessStatusCode)
         {
             return;
         }
         
-        var shortenUrlJson = await responseMessage.Content.ReadAsStringAsync();
-        var shortenUrlObj = JsonSerializer.Deserialize<ShortenUrlResponse>(shortenUrlJson);
+        var shortenUrl = await responseMessage.Content.ReadAsStringAsync();
         
-        shortUrls.Add(originUrl, shortenUrlObj.ShortenedUrl);
+        shortUrls.Add(originUrl, shortenUrl);
         await _storageAccessor.SetValueAsync("shortUrls", shortUrls);
         url = string.Empty;
     }
