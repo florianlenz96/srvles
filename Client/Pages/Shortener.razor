@@ -15,27 +15,41 @@
         
         <EditForm Model="@url" OnValidSubmit="@Shorten">
             <input type="url" name="url" placeholder="Enter your URL" required @bind="url" />
-            <button type="submit">Shorten</button>
+            @if (!loading)
+            {
+                <button style="width: 150px;" type="submit">Short it</button>
+            }
+            else
+            {
+                <Button style="width: 150px;" Loading="true">
+                    <LoadingTemplate>
+                        <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+                        Shorting...
+                    </LoadingTemplate>
+                </Button>
+            }
+            
         </EditForm>
+        
+        
         
         <div class="shorten-urls">
             @foreach (var shortUrl in shortUrls)
             {
                 <div class="shortened-url">
                     <span class="origin-url">@shortUrl.Key</span>
-                    <a class="short-url" href="@shortUrl.Value" target="_blank">@string.Join(".", shortUrl.Value.Split(".")[^2..])</a>
+                    <a class="short-url" href="https://@shortUrl.Value" target="_blank">@shortUrl.Value</a>
                     <i class="icon bi bi-qr-code" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"></i>
                     <i class="icon bi bi-clipboard" onclick="@CopyToClipboard(shortUrl.Value)" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"></i>
                 </div>
             }
         </div>
-        
-        <img src="neocentric.png" width="100" />
     </article>
 </div>
 
 @code {
     string url = string.Empty;
+    bool loading = false;
     Dictionary<string, string> shortUrls = new();
     
     [Inject]
@@ -60,6 +74,7 @@
 
     async Task Shorten(EditContext editContext)
     {
+        loading = true;
         var originUrl = editContext.Model.ToString();
         
         var json = JsonSerializer.Serialize(new ShortenUrlRequest
@@ -74,10 +89,11 @@
         }
         
         var shortenUrl = await responseMessage.Content.ReadAsStringAsync();
-        
         shortUrls.Add(originUrl, shortenUrl);
         await _storageAccessor.SetValueAsync("shortUrls", shortUrls);
         url = string.Empty;
+        
+        loading = false;
     }
     
     async Task CopyToClipboard(string url)
